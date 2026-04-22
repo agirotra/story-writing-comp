@@ -1,6 +1,6 @@
 // ── RAZORPAY & GOOGLE SHEET CONFIG ──
 const RAZORPAY_KEY = 'rzp_live_RDqX2u6rbGMpdM';
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxUp54mGAOR8ZisItd9A5xc-WYOmgNRIS-kOCU9NKfMth5lOr7Dxzh4neMw4C2M-D-tUA/exec'; // replace after deploying appsscript.gs
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbz0GWwr5RHWDbNKORyY7Pj67wzZmKojlD7Q3y8-hIs02O4ooZ5UbUInnMDKd1DV_SODMA/exec';
 const ENTRY_FEE    = 490;
 
 // ── MOBILE NAV ──
@@ -107,7 +107,7 @@ function validateForm() {
 // ── SEND TO GOOGLE SHEET ──
 function sendToSheet(paymentId, status) {
   const payload = {
-    token:      'BUKMUK2026SC',
+    token:      'BUKMUK_STORYCOMP_2026',
     childName:  val('child_name'),
     childAge:   val('child_age'),
     theme:      val('theme'),
@@ -126,7 +126,7 @@ function sendToSheet(paymentId, status) {
   fetch(SCRIPT_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload),
   }).catch(() => {});
 }
