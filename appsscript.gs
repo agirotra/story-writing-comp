@@ -3,7 +3,7 @@
 
 var SECRET_TOKEN = 'BUKMUK_STORYCOMP_2026';
 var ADMIN_EMAILS = 'abhinav.girotra@gmail.com,shefali.malhotra@gmail.com';
-var COMP_URL     = 'https://agirotra.github.io/story-writing-comp/';
+var COMP_URL     = 'https://competition.bukmuk.com/';
 var FOLDER_NAME  = 'Bukmuk Short Story Competition 2026 — Submissions';
 
 function doPost(e) {
