@@ -1,6 +1,6 @@
 // ── RAZORPAY & GOOGLE SHEET CONFIG ──
 const RAZORPAY_KEY = 'rzp_live_RDqX2u6rbGMpdM';
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwOCICgER2v80RACWvHlXZAE7Nvq3EACpYt7EkRdL4yoOichomKv1bnr8ItAX-VcEE2ZA/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxn4ZikcY9FtkNHqKoCZMLYvTaECnT5kVxZmcxnYTiYuHVS_aJa2SKhRgvvyUCx4efH/exec';
 const ENTRY_FEE    = 490;
 
 // ── MOBILE NAV ──
