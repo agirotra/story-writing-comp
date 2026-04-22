@@ -32,7 +32,7 @@ function doPost(e) {
     }
 
     // ── LOG TO SHEET ──
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Entries');
 
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
