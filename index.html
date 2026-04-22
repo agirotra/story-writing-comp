@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Storywriting Competition 2026 — Bukmuk Library & Publishing</title>
-  <meta name="description" content="Join the Bukmuk Storywriting Competition 2026! Three exciting categories for ages 6–17. Top stories published in an international anthology. Enter by 30th April 2026." />
-  <meta property="og:title" content="Storywriting Competition 2026 — Bukmuk" />
-  <meta property="og:description" content="Write your story. Get published internationally. Three categories for ages 6–17. Enter by 30th April 2026." />
+  <title>Short Story Writing Competition 2026 — Bukmuk Library & Publishing</title>
+  <meta name="description" content="Join the Bukmuk Short Story Writing Competition 2026! Three exciting categories for ages 6–17. Top stories published in an international anthology. Enter by 30th June 2026." />
+  <meta property="og:title" content="Short Story Writing Competition 2026 — Bukmuk" />
+  <meta property="og:description" content="Write your story. Get published internationally. Three categories for ages 6–17. Enter by 30th June 2026." />
   <meta property="og:image" content="https://www.bukmuk.com/assets/bukmuk-favicon.png" />
   <link rel="icon" href="https://bukmuk.com/assets/darklogo.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,14 +46,14 @@
   </div>
   <div class="hero-content">
     <div class="hero-organiser">Bukmuk Library &amp; Bukmuk Publishing</div>
-    <h1>Storywriting<br /><span>Competition 2026</span></h1>
+    <h1>Short Story Writing<br /><span>Competition 2026</span></h1>
     <p class="hero-sub">
       Proudly present three exciting story categories for young writers aged 6–17.
       Write your story. Get published internationally.
     </p>
     <div class="deadline-badge">
       <span class="pulse"></span>
-      Entries close: 30th April 2026
+      Entries close: 30th June 2026
     </div>
     <div class="countdown" aria-label="Countdown to deadline">
       <div class="count-block">
@@ -212,12 +212,12 @@
 
       <div class="step">
         <div class="step-num" aria-hidden="true">🚀</div>
-        <h3 class="step-title">Email Your Story</h3>
+        <h3 class="step-title">Upload &amp; Submit</h3>
         <p class="step-desc">
-          After payment, email your story file (.docx or PDF) to
-          <strong>helpdesk@bukmuk.com</strong> before 30th April 2026.
-          Our literary jury will evaluate entries and announce results.
-          Follow <a href="https://www.instagram.com/bukmuklibrary/" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700;">@bukmuklibrary</a> for updates.
+          Upload your story file (.docx or PDF) directly in the form.
+          After payment, it's saved automatically — no email needed.
+          Submit before 30th June 2026. Our literary jury will evaluate
+          entries and announce results. Follow <a href="https://www.instagram.com/bukmuklibrary/" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700;">@bukmuklibrary</a> for updates.
         </p>
       </div>
 
@@ -254,7 +254,7 @@
       </div>
       <div class="rule-item">
         <span class="rule-icon">📅</span>
-        <span>All entries must be submitted by 30th April 2026.</span>
+        <span>All entries must be submitted by 30th June 2026.</span>
       </div>
     </div>
     <div class="entry-fee-box">
@@ -274,13 +274,13 @@
     <div class="section-tag" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);">Registration</div>
     <h2 class="section-title" style="color:var(--white);">Register Your Entry</h2>
     <p class="section-sub" style="margin:0 auto 40px;color:rgba(255,255,255,0.8);">
-      Fill in your details and pay ₹490 securely via Razorpay.
-      After payment, email your story file to <strong style="color:var(--accent-light);">helpdesk@bukmuk.com</strong>.
+      Fill in your details, upload your story file, and pay ₹490 securely via Razorpay.
+      Your story is uploaded automatically after payment.
     </p>
 
     <div class="reg-form" id="reg-form-wrap">
       <div class="urgency-bar">
-        ⚡ <span>Entries close 30th April 2026</span> — don't miss out!
+        ⚡ <span>Entries close 30th June 2026</span> — don't miss out!
       </div>
 
       <form id="entryForm" onsubmit="return false;" novalidate>
@@ -347,6 +347,21 @@
           </div>
         </div>
 
+        <!-- STEP 4: Story upload -->
+        <div class="form-section">
+          <div class="form-section-label">Step 4 · Upload Your Story</div>
+          <div class="fg">
+            <label>Story File * <span style="font-weight:600;opacity:0.6;">(.docx or PDF · max 10MB)</span></label>
+            <div class="file-upload-zone" id="upload-zone">
+              <input type="file" id="story_file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required />
+              <div class="file-upload-icon">📄</div>
+              <div class="file-upload-text">Click to upload your story file</div>
+              <div class="file-upload-hint">.docx or PDF · max 10MB</div>
+              <div class="file-name-display" id="file-name-display"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- FEE BOX -->
         <div class="fee-preview">
           <div>
@@ -361,7 +376,7 @@
         <button type="button" id="pay-btn" onclick="startPayment()">
           Pay ₹490 &amp; Register →
         </button>
-        <p class="form-note">After payment you'll receive a confirmation. Email your story to <strong>helpdesk@bukmuk.com</strong></p>
+        <p class="form-note">Your story file will be uploaded automatically after payment is confirmed.</p>
       </form>
     </div>
 

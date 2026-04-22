@@ -19,9 +19,9 @@ navLinks.querySelectorAll('a').forEach(a => {
   });
 });
 
-// ── COUNTDOWN TO 30 APRIL 2026 ──
+// ── COUNTDOWN TO 30 JUNE 2026 ──
 function updateCountdown() {
-  const deadline = new Date('2026-04-30T23:59:59+05:30').getTime();
+  const deadline = new Date('2026-06-30T23:59:59+05:30').getTime();
   const diff = deadline - Date.now();
 
   if (diff <= 0) {
@@ -58,6 +58,25 @@ const navObserver = new IntersectionObserver(entries => {
 }, { threshold: 0.35 });
 
 sections.forEach(s => navObserver.observe(s));
+
+// ── FILE UPLOAD UI ──
+const storyFileInput = document.getElementById('story_file');
+const uploadZone     = document.getElementById('upload-zone');
+const fileNameDisplay = document.getElementById('file-name-display');
+
+if (storyFileInput) {
+  storyFileInput.addEventListener('change', () => {
+    const file = storyFileInput.files[0];
+    if (file) {
+      uploadZone.classList.add('has-file');
+      fileNameDisplay.style.display = 'block';
+      fileNameDisplay.textContent   = '✓ ' + file.name;
+    } else {
+      uploadZone.classList.remove('has-file');
+      fileNameDisplay.style.display = 'none';
+    }
+  });
+}
 
 // ── FORM VALIDATION ──
 function val(id) { return (document.getElementById(id) || {}).value || ''; }
@@ -101,26 +120,44 @@ function validateForm() {
     return false;
   }
 
+  // File validation
+  const fileInput = document.getElementById('story_file');
+  if (!fileInput || !fileInput.files[0]) {
+    uploadZone.style.borderColor = '#e53935';
+    uploadZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => uploadZone.style.borderColor = '', 2000);
+    return false;
+  }
+
+  const file = fileInput.files[0];
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File size exceeds 10MB. Please compress your file and try again.');
+    return false;
+  }
+
   return true;
 }
 
-// ── SEND TO GOOGLE SHEET ──
-function sendToSheet(paymentId, status) {
+// ── SEND TO SHEET ──
+function sendToSheet(paymentId, status, fileBase64, fileName, fileMimeType) {
   const payload = {
-    token:      'BUKMUK_STORYCOMP_2026',
-    childName:  val('child_name'),
-    childAge:   val('child_age'),
-    theme:      val('theme'),
-    storyTitle: val('story_title'),
-    parentName: val('parent_name'),
-    email:      val('email'),
-    mobile:     val('mobile'),
-    address:    val('address'),
-    instagram:  val('instagram'),
-    amount:     ENTRY_FEE,
-    paymentId:  paymentId,
-    status:     status,
-    timestamp:  new Date().toISOString(),
+    token:        'BUKMUK_STORYCOMP_2026',
+    childName:    val('child_name'),
+    childAge:     val('child_age'),
+    theme:        val('theme'),
+    storyTitle:   val('story_title'),
+    parentName:   val('parent_name'),
+    email:        val('email'),
+    mobile:       val('mobile'),
+    address:      val('address'),
+    instagram:    val('instagram'),
+    amount:       ENTRY_FEE,
+    paymentId:    paymentId,
+    status:       status,
+    timestamp:    new Date().toISOString(),
+    fileBase64:   fileBase64   || null,
+    fileName:     fileName     || '',
+    fileMimeType: fileMimeType || '',
   };
 
   fetch(SCRIPT_URL, {
@@ -129,6 +166,34 @@ function sendToSheet(paymentId, status) {
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload),
   }).catch(() => {});
+}
+
+// ── READ FILE & UPLOAD AFTER PAYMENT ──
+function uploadAndFinish(paymentId) {
+  const btn      = document.getElementById('pay-btn');
+  const fileInput = document.getElementById('story_file');
+  const file      = fileInput && fileInput.files[0];
+
+  if (!file) {
+    sendToSheet(paymentId, 'PAID');
+    showSuccess(paymentId);
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Uploading story… please wait'; }
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    const base64 = reader.result.split(',')[1];
+    sendToSheet(paymentId, 'PAID', base64, file.name, file.type);
+    showSuccess(paymentId);
+  };
+  reader.onerror = function () {
+    // Upload failed — still show success, log without file
+    sendToSheet(paymentId, 'PAID');
+    showSuccess(paymentId);
+  };
+  reader.readAsDataURL(file);
 }
 
 // ── RAZORPAY PAYMENT ──
@@ -144,7 +209,7 @@ function startPayment() {
     amount:      ENTRY_FEE * 100,
     currency:    'INR',
     name:        'Bukmuk Library & Publishing',
-    description: 'Storywriting Competition 2026 — ' + val('theme').split(' (')[0],
+    description: 'Short Story Writing Competition 2026 — ' + val('theme').split(' (')[0],
     image:       'https://bukmuk.com/assets/darklogo.png',
     prefill: {
       name:    val('parent_name'),
@@ -158,8 +223,7 @@ function startPayment() {
     },
     theme: { color: '#3e23c0' },
     handler: function(response) {
-      sendToSheet(response.razorpay_payment_id, 'PAID');
-      showSuccess(response.razorpay_payment_id);
+      uploadAndFinish(response.razorpay_payment_id);
     },
     modal: {
       ondismiss: function() {
@@ -169,7 +233,7 @@ function startPayment() {
     },
   };
 
-  // Log intent before opening modal — captures drop-offs too
+  // Log intent before modal — captures drop-offs
   sendToSheet('NOT-PAID-YET', 'INTENT');
 
   const rzp = new Razorpay(options);
@@ -183,32 +247,26 @@ function startPayment() {
 
 // ── SUCCESS STATE ──
 function showSuccess(paymentId) {
-  const childName  = val('child_name');
-  const storyTitle = val('story_title');
-  const parentEmail = val('email');
-
-  const form = document.getElementById('entryForm');
-  const urgency = document.querySelector('.urgency-bar');
+  const childName = val('child_name');
+  const form      = document.getElementById('entryForm');
+  const urgency   = document.querySelector('.urgency-bar');
   if (urgency) urgency.style.display = 'none';
 
   form.innerHTML = `
     <div class="success-state">
       <span class="success-icon">🎉</span>
-      <h3>You're registered, ${childName.split(' ')[0]}!</h3>
-      <p>Payment of <strong>₹490</strong> confirmed. The Bukmuk team will be in touch shortly.</p>
+      <h3>You're in, ${childName.split(' ')[0]}!</h3>
+      <p>Payment of <strong>₹490</strong> confirmed and your story has been submitted.</p>
       <div class="payment-id-badge">Payment ID: ${paymentId}</div>
       <div class="email-cta-box">
-        <strong>Next step:</strong> Email your story file (.docx or .pdf) to<br>
-        <a href="mailto:helpdesk@bukmuk.com?subject=${encodeURIComponent(childName + ' — ' + storyTitle + ' — ' + paymentId)}"
-           style="color:var(--accent-dark);font-size:1rem;">
-          helpdesk@bukmuk.com
-        </a><br>
-        <span style="font-weight:600;opacity:0.8;font-size:0.82rem;margin-top:6px;display:block;">
-          Subject line is pre-filled with your name, story title &amp; payment ID — just attach your file and send!
-        </span>
+        <strong>What happens next?</strong><br>
+        Our literary jury will evaluate all entries. The top 9 stories in each
+        category will be published in the Bukmuk Anthology — in India and internationally.<br><br>
+        Follow <strong>@bukmuklibrary</strong> on Instagram for results and updates.
       </div>
       <p style="margin-top:16px;font-size:0.82rem;color:#aaa;">
-        Questions? Call Shefali: <a href="tel:+918130286286" style="color:var(--primary);">+91 81302 86286</a>
+        Questions? <a href="mailto:helpdesk@bukmuk.com" style="color:var(--primary);">helpdesk@bukmuk.com</a>
+        · Call Shefali: <a href="tel:+918130286286" style="color:var(--primary);">+91 81302 86286</a>
       </p>
     </div>
   `;

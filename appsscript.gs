@@ -1,9 +1,10 @@
-// ── Bukmuk Storywriting Competition 2026 — Google Apps Script ──
+// ── Bukmuk Short Story Writing Competition 2026 — Google Apps Script ──
 // Deploy as: Web App → Execute as: Me → Who has access: Anyone
 
-var SECRET_TOKEN   = 'BUKMUK_STORYCOMP_2026';
-var ADMIN_EMAILS   = 'abhinav.girotra@gmail.com,shefali.malhotra@gmail.com';
-var COMP_URL       = 'https://agirotra.github.io/story-writing-comp/';
+var SECRET_TOKEN = 'BUKMUK_STORYCOMP_2026';
+var ADMIN_EMAILS = 'abhinav.girotra@gmail.com,shefali.malhotra@gmail.com';
+var COMP_URL     = 'https://agirotra.github.io/story-writing-comp/';
+var FOLDER_NAME  = 'Bukmuk Short Story Competition 2026 — Submissions';
 
 function doPost(e) {
   try {
@@ -13,17 +14,33 @@ function doPost(e) {
       return ContentService.createTextOutput('Unauthorized');
     }
 
+    // ── SAVE STORY FILE TO DRIVE ──
+    var driveUrl = '';
+    if (data.fileBase64 && data.fileName) {
+      try {
+        var folder    = getOrCreateFolder(FOLDER_NAME);
+        var ext       = data.fileName.substring(data.fileName.lastIndexOf('.'));
+        var safeName  = (data.childName || 'unknown') + '_' + (data.storyTitle || 'story') + '_' + (data.paymentId || '') + ext;
+        var fileBytes = Utilities.base64Decode(data.fileBase64);
+        var blob      = Utilities.newBlob(fileBytes, data.fileMimeType || 'application/octet-stream', safeName);
+        var file      = folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        driveUrl = file.getUrl();
+      } catch (uploadErr) {
+        driveUrl = 'Upload error: ' + uploadErr.toString();
+      }
+    }
+
     // ── LOG TO SHEET ──
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
-    // Write header row if sheet is empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow([
         'Timestamp', 'Status', 'Payment ID', 'Amount (₹)',
         'Child Name', 'Child Age', 'Story Category', 'Story Title',
-        'Parent Name', 'Email', 'Mobile', 'Instagram', 'Delivery Address'
+        'Parent Name', 'Email', 'Mobile', 'Instagram', 'Delivery Address', 'Story File (Drive Link)'
       ]);
-      sheet.getRange(1, 1, 1, 13).setFontWeight('bold');
+      sheet.getRange(1, 1, 1, 14).setFontWeight('bold');
       sheet.setFrozenRows(1);
     }
 
@@ -40,13 +57,14 @@ function doPost(e) {
       data.email      || '',
       data.mobile     || '',
       data.instagram  || '',
-      data.address    || ''
+      data.address    || '',
+      driveUrl
     ]);
 
     var statusLabel = data.status === 'PAID' ? '✅ PAID' : '⚠️ INTENT — Not Paid';
 
     // ── ADMIN EMAIL ──
-    var adminSubject = statusLabel + ' — Bukmuk Storywriting Competition 2026';
+    var adminSubject = statusLabel + ' — Bukmuk Short Story Writing Competition 2026';
     var adminBody = 'Status: ' + statusLabel + '\n\n'
       + '── Child Details ──\n'
       + 'Name: '           + (data.childName  || '') + '\n'
@@ -62,32 +80,29 @@ function doPost(e) {
       + 'Address: ' + (data.address || '') + '\n\n'
       + '── Payment ──\n'
       + 'Amount: ₹'    + (data.amount    || '') + '\n'
-      + 'Payment ID: ' + (data.paymentId || '');
+      + 'Payment ID: ' + (data.paymentId || '') + '\n\n'
+      + '── Story File ──\n'
+      + (driveUrl ? driveUrl : 'No file uploaded');
 
     GmailApp.sendEmail(ADMIN_EMAILS, adminSubject, adminBody);
 
-    // ── PARENT CONFIRMATION EMAIL (PAID only) ──
+    // ── PARENT CONFIRMATION (PAID only) ──
     if (data.email && data.status === 'PAID') {
-      var parentSubject = '🎉 Registration Confirmed — Bukmuk Storywriting Competition 2026';
+      var parentSubject = '🎉 Registration Confirmed — Bukmuk Short Story Writing Competition 2026';
       var parentBody = 'Hi ' + (data.parentName || '') + ',\n\n'
-        + 'Registration for the Bukmuk Storywriting Competition 2026 is confirmed! 🎉\n\n'
+        + 'Registration for the Bukmuk Short Story Writing Competition 2026 is confirmed! 🎉\n\n'
         + '── Your Entry Details ──\n'
-        + 'Child\'s Name: '    + (data.childName  || '') + '\n'
-        + 'Age: '              + (data.childAge   || '') + '\n'
-        + 'Story Category: '   + (data.theme      || '') + '\n'
-        + 'Story Title: '      + (data.storyTitle || '') + '\n'
-        + 'Amount Paid: ₹'     + (data.amount     || '') + '\n'
-        + 'Payment ID: '       + (data.paymentId  || '') + '\n\n'
-        + '── Next Step — Submit Your Story ──\n'
-        + 'Please email your story file (.docx or PDF) to:\n'
-        + 'helpdesk@bukmuk.com\n\n'
-        + 'Use this subject line:\n'
-        + (data.childName || '') + ' — ' + (data.storyTitle || '') + ' — ' + (data.paymentId || '') + '\n\n'
-        + 'Last date to submit: 30th April 2026\n\n'
+        + 'Child\'s Name: '  + (data.childName  || '') + '\n'
+        + 'Age: '            + (data.childAge   || '') + '\n'
+        + 'Story Category: ' + (data.theme      || '') + '\n'
+        + 'Story Title: '    + (data.storyTitle || '') + '\n'
+        + 'Amount Paid: ₹'   + (data.amount     || '') + '\n'
+        + 'Payment ID: '     + (data.paymentId  || '') + '\n\n'
+        + (driveUrl ? ('Story File: ' + driveUrl + '\n\n') : '')
         + '── What Happens Next ──\n'
         + 'Our literary jury will evaluate all entries. The top 9 stories in each\n'
         + 'category will be published in the Bukmuk Anthology — in India and internationally.\n\n'
-        + 'Follow us on Instagram for updates: @bukmuklibrary\n\n'
+        + 'Follow us on Instagram for results: @bukmuklibrary\n\n'
         + 'For any questions:\n'
         + 'Email: helpdesk@bukmuk.com\n'
         + 'Call / WhatsApp Shefali: +91 81302 86286\n\n'
@@ -98,13 +113,13 @@ function doPost(e) {
       GmailApp.sendEmail(data.email, parentSubject, parentBody);
     }
 
-    // ── INTENT REMINDER EMAIL ──
+    // ── INTENT REMINDER ──
     if (data.email && data.status === 'INTENT') {
-      var intentSubject = 'You left something behind — Bukmuk Storywriting Competition 2026';
+      var intentSubject = 'You left something behind — Bukmuk Short Story Writing Competition 2026';
       var intentBody = 'Hi ' + (data.parentName || '') + ',\n\n'
-        + 'We noticed you started registering for the Bukmuk Storywriting Competition 2026\n'
+        + 'We noticed you started registering for the Bukmuk Short Story Writing Competition 2026\n'
         + 'but didn\'t complete the payment.\n\n'
-        + 'Your entry is not confirmed yet — the deadline is 30th April 2026.\n\n'
+        + 'Your entry is not confirmed yet — the deadline is 30th June 2026.\n\n'
         + 'Complete your registration here:\n'
         + COMP_URL + '\n\n'
         + 'Entry fee: ₹490 · Secure payment via Razorpay\n\n'
@@ -122,4 +137,9 @@ function doPost(e) {
   } catch (err) {
     return ContentService.createTextOutput('Error: ' + err.toString());
   }
+}
+
+function getOrCreateFolder(name) {
+  var folders = DriveApp.getFoldersByName(name);
+  return folders.hasNext() ? folders.next() : DriveApp.createFolder(name);
 }
