@@ -3,7 +3,7 @@ const RAZORPAY_KEY = 'rzp_live_RDqX2u6rbGMpdM';
 const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwTZ2HTNZ87pG7yQrd3UOcXjvRlk8zN_Vgg9HlhstxvpLGigIR3kATUckCpAGKr_Hc_nw/exec';
 const SHEET_TOKEN  = 'BUKMUK_STORYCOMP_2026';
 const ENTRY_FEE    = 490;
-const DEADLINE_ISO = '2026-08-31T23:59:59+05:30';
+const DEADLINE_ISO = '2026-10-31T23:59:59+05:30';
 
 // Paste your GA4 Measurement ID here (looks like 'G-XXXXXXXXXX') to enable analytics.
 // Left empty, no tracking script is loaded at all.
@@ -461,8 +461,8 @@ function showSuccess(paymentId, warning) {
       ${fileWarning}
       <div class="email-cta-box">
         <strong>What happens next?</strong><br>
-        Our literary jury will evaluate all entries. The top 10 stories in each
-        category will be published in the Bukmuk Anthology — in India and internationally.<br><br>
+        Our jury will read every entry. The ten best stories in each age group
+        will be printed in that age group's own anthology, three books in all, sold in India and internationally.<br><br>
         Follow <strong>@bukmuklibrary</strong> on Instagram for results and updates.
       </div>
       <p style="margin-top:16px;font-size:0.82rem;color:#aaa;">

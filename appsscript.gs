@@ -13,7 +13,7 @@ var ADMIN_EMAILS  = 'abhinav.girotra@gmail.com,shefali.malhotra@gmail.com';
 var COMP_URL      = 'https://competition.bukmuk.com/';
 var FOLDER_NAME   = 'Bukmuk Short Story Competition 2026 — Submissions';
 var SHEET_NAME    = 'Entries';
-var DEADLINE_TEXT = '31st August 2026';
+var DEADLINE_TEXT = '31st October 2026';
 var ENTRY_FEE     = 490;
 
 // Wait this long after an abandoned checkout before nudging the parent.
@@ -386,8 +386,9 @@ function sendParentConfirmation(data, driveUrl) {
         ? 'Your story file has been received.\n\n'
         : 'We could not attach your story file — please reply to this email with it attached.\n\n')
     + '── What Happens Next ──\n'
-    + 'Our literary jury will evaluate all entries. The top 10 stories in each\n'
-    + 'category will be published in the Bukmuk Anthology — in India and internationally.\n\n'
+    + 'Our jury will read every entry. The ten best stories in each age group\n'
+    + 'will be printed in that age group\'s own anthology, three books in all,\n'
+    + 'sold in India and internationally.\n\n'
     + 'Follow us on Instagram for results: @bukmuklibrary\n\n'
     + 'For any questions:\n'
     + 'Email: helpdesk@bukmuk.com\n'
@@ -413,7 +414,7 @@ function intentBody(row) {
     + 'Complete your registration here:\n'
     + COMP_URL + '\n\n'
     + 'Entry fee: ₹' + ENTRY_FEE + ' · Secure payment via Razorpay\n\n'
-    + 'The top 10 stories in each category will be published in an international anthology.\n'
+    + 'The ten best stories in each age group will be printed in that age group\'s own anthology.\n'
     + 'Don\'t miss this chance for ' + childName + ' to become a published author!\n\n'
     + 'For help call / WhatsApp Shefali: +91 81302 86286\n\n'
     + 'Team Bukmuk\n'
